@@ -24,8 +24,9 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
   try {
     const postsCollection = client.db('opbook').collection('posts');
+    const aboutCollection = client.db('opbook').collection('about');
    
-    const usersCollection = client.db('doctorsPortal').collection('users');
+    const usersCollection = client.db('opbook').collection('users');
 
 
     // app.get('/appoinmentOptions', async (req, res) => {
@@ -44,22 +45,22 @@ async function run() {
     // });
 
 
-    // app.get('/users', async (req, res) => {
-    //   const query = {}
-    //   const user = await usersCollection.find(query).toArray();
-    //   res.send(user);
-    // })
+    app.get('/posts', async (req, res) => {
+      const query = {}
+      const post = await postsCollection.find(query).toArray();
+      res.send(post);
+    })
 
 
-    // app.get('/bookings', verifyJWT, async (req, res) => {
-    //   const email = req.query.email;
-    //   console.log(email);
-    //   const decodedEmail = req.decoded.email;
-    //   const query = { email: email };
-    //   if (email !== decodedEmail) {
-    //     return res.status(403).send({ message: 'forbidden access' });
-    //   }
-    //   const result = await bookingsCollection.find(query).toArray();
+    // app.put('/users/:email', async (req, res) => {
+    //   const email = req.params.email;
+    //   // console.log(email);
+    //   // const decodedEmail = req.decoded.email;
+    //   // const query = { email: email };
+    //   // if (email !== decodedEmail) {
+    //   //   return res.status(403).send({ message: 'forbidden access' });
+    //   // }
+    //   const result = await aboutCollection.find(query).toArray();
     //   res.send(result);
     // });
 
@@ -101,32 +102,39 @@ async function run() {
     // });
 
 
-    // app.post('/users', async (req, res) => {
-    //   const user = req.body;
-    //   // console.log(user);
-    //   const result = await usersCollection.insertOne(user);
-    //   res.send(result);
-    // });
+    app.post('/posts', async (req, res) => {
+      const user = req.body;
+   
+      // console.log(user);
+      const result = await postsCollection.insertOne(user);
+      res.send(result);
+    });
+    app.post('/users', async (req, res) => {
+      const user = req.body;
+   
+      // console.log(user);
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
 
 
-    // app.put('/users/admin/:id',verifyJWT, async (req, res) => {
-    //   const id = req.params.id;
-    //   const decodedEmail=req.decoded.email;
-    //   const query = {email: decodedEmail};
-    //   const user = await usersCollection.findOne(query);
-    //   if(user.role !== 'admin'){
-    //     return res.status(403).send({message:'forbidden Access'})
-    //   }
-    //   const filter = { _id: ObjectId(id) };
-    //   const options = { upsert: true };
-    //   const updatedDoc = {
-    //     $set: {
-    //       role: 'admin'
-    //     }
-    //   }
-    //   const result = await usersCollection.updateOne(filter, updatedDoc, options);
-    //   res.send(result);
-    // })
+    app.put('/users/:email', async (req, res) => {
+      // const id = req.params.id;
+      const userData =req.body;
+      const email = req.params.email;
+      // const decodedEmail=req.decoded.email;
+      // const query = {email: decodedEmail};
+      const query = {email: email};
+      const user = await usersCollection.findOne(query);
+     
+      // const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {userData}
+      };
+      const result = await usersCollection.updateOne(query, updatedDoc, options);
+      res.send(result);
+    })
 
 
   }
